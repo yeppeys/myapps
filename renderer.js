@@ -4,27 +4,37 @@ const form = document.getElementById('imageForm');
 const imageContainer = document.getElementById('imageContainer');
 const promptInput = document.getElementById('prompt');
 const stepsInput = document.getElementById('steps');
+const negative_promptInput = document.getElementById('negative_prompt');
+const batch_sizeInput = document.getElementById('batch_size');
+
 
 form.addEventListener('submit', async function(event) {
     event.preventDefault();
     
     const prompt = promptInput.value;
+    const negative_prompt = negative_promptInput.value;
     const steps = stepsInput.value;
+    const batch_size = batch_sizeInput.value;
 
     try {
         const response = await axios.post('http://localhost:7861/sdapi/v1/txt2img', {
             prompt,
-            steps
+            negative_prompt,
+            steps,
+            batch_size
         });
         
         const images = response.data.images;
-        const imageData = images[0]; // Assuming you want to display the first image
 
-        const img = new Image();
-        img.src = `data:image/png;base64,${imageData}`;
+        // Clear previous images
+        imageContainer.innerHTML = '';
 
-        imageContainer.innerHTML = ''; // Clear previous image
-        imageContainer.appendChild(img);
+        // Display all images
+        images.forEach(imageData => {
+            const img = new Image();
+            img.src = `data:image/png;base64,${imageData}`;
+            imageContainer.appendChild(img);
+        });
     } catch (error) {
         console.error('Ошибка:', error);
     }
