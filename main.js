@@ -19,7 +19,7 @@ function createWindow() {
 
     mainWindow.on('closed', function () {
         if (serverPID) {
-            exec(`taskkill /PID ${serverPID} /F`, (err, stdout, stderr) => {
+            exec(`taskkill  ${serverPID} /F`, (err, stdout, stderr) => {
                 if (err) {
                     console.error('Error killing server process:', err);
                 } else {
@@ -44,7 +44,7 @@ app.on('window-all-closed', function () {
 });
 
 function startServer() {
-    const command = 'powershell -NoLogo -WindowStyle Hidden -Command "cd C://stable-diffusion-webui; ./webui.bat --nowebui --no-half"';
+    const command = 'powershell -NoLogo -WindowStyle Hidden -Command "cd C://stable-diffusion-webui; ./webui.bat --nowebui"';
 
     serverProcess = exec(command, { detached: true, shell: true });
 
