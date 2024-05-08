@@ -4,8 +4,23 @@ const { exec } = require('child_process');
 
 let serverProcess; 
 let serverPID; 
+let loadingWindow;
 
-function createWindow() {
+function createLoadingWindow() {
+    loadingWindow = new BrowserWindow({
+        width: 300,
+        height: 200,
+        frame: false, // убираем рамку окна, чтобы было похоже на loading screen
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    });
+
+    loadingWindow.loadFile(path.join(__dirname, 'loading.html'));
+}
+
+function createMainWindow() {
     const mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
@@ -19,24 +34,27 @@ function createWindow() {
 
     mainWindow.on('closed', function () {
         if (serverPID) {
-            exec(`taskkill  ${serverPID} /F`, (err, stdout, stderr) => {
+            exec(`taskkill /PID ${serverPID} /F`, (err, stdout, stderr) => {
                 if (err) {
                     console.error('Error killing server process:', err);
+                } else if (stderr) {
+                    console.error('Error killing server process:', stderr);
                 } else {
                     console.log('Server process killed successfully.');
+                    // Закрываем приложение после успешного завершения сервера
+                    app.quit();
                 }
             });
+        } else {
+            // Если serverPID не определен, просто закрываем приложение
+            app.quit();
         }
     });
 }
 
 app.whenReady().then(() => {
-    createWindow();
+    createLoadingWindow(); // Показываем окно загрузки
     startServer();
-
-    app.on('activate', function () {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow();
-    });
 });
 
 app.on('window-all-closed', function () {
@@ -44,7 +62,7 @@ app.on('window-all-closed', function () {
 });
 
 function startServer() {
-    const command = 'powershell -NoLogo -WindowStyle Hidden -Command "cd C://stable-diffusion-webui; ./webui.bat --nowebui"';
+    const command = 'powershell -NoLogo -WindowStyle Hidden -Command "cd C://stable-diffusion-webui; ./webui.bat --nowebui --disable-nan-check"';
 
     serverProcess = exec(command, { detached: true, shell: true });
 
@@ -54,6 +72,11 @@ function startServer() {
         if (match && match[1]) {
             serverPID = parseInt(match[1]);
             console.log(`Server process PID: ${serverPID}`);
+            // Закрываем окно загрузки и открываем основное окно
+            if (loadingWindow) {
+                loadingWindow.close();
+                createMainWindow();
+            }
         }
     });
 
@@ -61,6 +84,7 @@ function startServer() {
         console.log(`child process exited with code ${code}`);
     });
 }
+
 
 
 
