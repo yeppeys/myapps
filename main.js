@@ -10,7 +10,7 @@ function createLoadingWindow() {
     loadingWindow = new BrowserWindow({
         width: 300,
         height: 200,
-        frame: false, // убираем рамку окна, чтобы было похоже на loading screen
+        frame: false, 
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -41,19 +41,17 @@ function createMainWindow() {
                     console.error('Error killing server process:', stderr);
                 } else {
                     console.log('Server process killed successfully.');
-                    // Закрываем приложение после успешного завершения сервера
                     app.quit();
                 }
             });
         } else {
-            // Если serverPID не определен, просто закрываем приложение
             app.quit();
         }
     });
 }
 
 app.whenReady().then(() => {
-    createLoadingWindow(); // Показываем окно загрузки
+    createLoadingWindow(); 
     startServer();
 });
 
@@ -72,7 +70,6 @@ function startServer() {
         if (match && match[1]) {
             serverPID = parseInt(match[1]);
             console.log(`Server process PID: ${serverPID}`);
-            // Закрываем окно загрузки и открываем основное окно
             if (loadingWindow) {
                 loadingWindow.close();
                 createMainWindow();
