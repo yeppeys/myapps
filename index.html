@@ -4,52 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>app</title>
-    <style>
-        .progress-bar {
-            width: 100%;
-            height: 30px;
-            background-color: #f0f0f0;
-            margin-bottom: 10px;
-        }
-        .progress {
-            height: 100%;
-            background-color: #4caf50;
-            text-align: center;
-            line-height: 30px;
-            color: white;
-        }
-    </style>
 </head>
 <body>
+    <a href="txttoimg.html">
+        <button>Текст в изображение</button><br><br>
+    </a>
+    <a href="imgtoimg.html">
+        <button>Изображение в изображение</button><br><br>
+    </a>
     <a href="inpaint.html">
         <button>Inpaint</button><br><br>
     </a>
     <a href="model.html">
-        <button>model</button><br><br>
+        <button>Выбор модели</button><br><br>
     </a>
-    <form id="imageForm">
-        <label for="prompt">Текстовый запрос:</label><br>
-        <input type="text" id="prompt" name="prompt"><br>
-        <label for="negative_prompt">Негативный запрос:</label><br>
-        <input type="text" id="negative_prompt" name="negative_prompt"><br>
-        <label for="steps">Количество шагов:</label><br>
-        <input type="number" id="steps" name="steps" min="1" max="100"><br>
-        <label for="batch_size">Количество генерируемых картинок:</label><br>
-        <input type="number" id="batch_size" name="batch_size" min="1" max="8"><br>
-        <input type="checkbox" id="restore_faces" name="restore_faces">
-        <label for="restore_faces">Восстановить лица</label><br>
-        <button type="submit">Сгенерировать изображение</button>
-    </form>
-
-    <div class="progress-bar">
-        <progress id="progress" max="100" value="0"></progress>
-        <span id="sampling-step"> </span>/<span id="sampling-steps"> </span>
-        <span id="time-info">00:00</span>
-    </div>    
-
-    <div id="imageContainer"></div>
-
-    <script src="renderer.js"></script>
 </body>
 </html>
 

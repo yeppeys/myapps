@@ -19,7 +19,8 @@
 	}
 
 	#drop-area {
-		width: 100%;
+		width: 512px;
+		height: 512px;
 		border: 2px dashed #ccc;
 		margin-bottom: 20px;
 		position: relative;
@@ -49,9 +50,70 @@
 	#right-section {
 		flex: 1;
 	}
+	#imageGallery {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        #imageContainer {
+            width: 512px;
+            height: 512px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            overflow: hidden;
+        }
+
+        #imageContainer img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        #prevBtn, #nextBtn {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 16px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            z-index: 1;
+            opacity: 0.5;
+            display: none;
+        }
+
+        #prevBtn {
+            left: 10px;
+        }
+
+        #nextBtn {
+            right: 10px;
+        }
+        #imageNumber {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            opacity: 0.75;
+            display: none;
+}
 </style>
 
-<body>
+<body onload="loadImageFromURL()">
 
 	<div id="container">
 		<div id="left-section">
@@ -88,7 +150,14 @@
 				<span id="time-info">00:00</span>
 			</div>
 
-			<div id="imageContainer"></div>
+			<div id="imageGallery">
+				<div id="imageContainer">
+					<button id="prevBtn">&#10094;</button>
+					<img id="displayedImage" src="">
+					<button id="nextBtn">&#10095;</button>
+					<div id="imageNumber"></div>
+				</div>
+			</div>
 		</div>
 	</div>
 
