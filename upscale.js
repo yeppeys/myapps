@@ -1,86 +1,80 @@
 const axios = require('axios');
-const translate = require('@iamtraction/google-translate');
 
 const form = document.getElementById('imageForm');
 const imageContainer = document.getElementById('imageContainer');
-const promptInput = document.getElementById('prompt');
-const stepsInput = document.getElementById('steps');
-const negativePromptInput = document.getElementById('negative_prompt');
-const batchSizeInput = document.getElementById('batch_size');
-const restoreFacesInput = document.getElementById('restore_faces');
+const upscalingResize = document.getElementById('resize');
 const progressBar = document.getElementById('progress');
-const samplingStepElement = document.getElementById('sampling-step');
-const samplingStepsElement = document.getElementById('sampling-steps');
-const timeInfoElement = document.getElementById('time-info');
-const denoisingStrength = document.getElementById('denoising_strength');
+const upscaleSelect = document.getElementById('upscaleSelect');
 
 let width;
 let height;
 let originalImageDataURL;
+let images = [];
+let currentIndex = 0;
+
+// Заполнение списка апскейлеров при загрузке страницы
+document.addEventListener('DOMContentLoaded', async () => {
+    await populateUpscaleSelect();
+    loadImageFromURL();
+});
 
 form.addEventListener('submit', async function (event) {
     event.preventDefault();
 
-    const prompt = promptInput.value;
-    const negativePrompt = negativePromptInput.value;
-    const steps = stepsInput.value;
-    const batchSize = batchSizeInput.value;
-    const restoreFaces = restoreFacesInput.checked;
-    const init_images = [originalImageDataURL];
-    const denoising_strength = denoisingStrength.value;
+    const selectedUpscaler = upscaleSelect.value;
+
+    const postData = {
+        upscaling_resize: parseFloat(upscalingResize.value),
+        upscaler_1: selectedUpscaler,
+        upscaler_2: "None",
+        image: originalImageDataURL.split(',')[1]  // Удаляем "data:image/png;base64,"
+    };
 
     try {
-        const [translatedPrompt, translatedNegativePrompt] = await Promise.all([
-            translate(prompt, { to: 'en' }),
-            translate(negativePrompt, { to: 'en' })
-        ]);
-        console.log('Translated Prompt:', translatedPrompt.text);
-        console.log('Translated Negative Prompt:', translatedNegativePrompt.text);
-
         fetchProgressData();
 
-        const response = await axios.post('http://localhost:7861/sdapi/v1/img2img', {
-            prompt: translatedPrompt.text,
-            negative_prompt: translatedNegativePrompt.text,
-            steps,
-            batch_size: batchSize,
-            restore_faces: restoreFaces,
-            scheduler: 'Automatic',
-            denoising_strength,
-            width,
-            height,
-            init_images
-        });
+        const response = await axios.post('http://localhost:7861/sdapi/v1/extra-single-image', postData);
 
-            currentIndex = 0;
-            images = response.data.images;
+        const receivedImage = response.data.image;
+        if (receivedImage) {
+            images = [receivedImage];
             console.log(images);
             console.log(response);
 
-            if (images.length > 0) {
-                displayImage(currentIndex);
+            displayImage(currentIndex);
 
-                if (images.length === 1) {
-                    document.getElementById('prevBtn').style.display = 'none';
-                    document.getElementById('nextBtn').style.display = 'none';
-                    document.getElementById('imageNumber').style.display = 'none';
-                } else {
-                    document.getElementById('prevBtn').style.display = 'block';
-                    document.getElementById('nextBtn').style.display = 'block';
-                    document.getElementById('imageNumber').style.display = 'block';
-                }
-            }
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('imageNumber').style.display = 'none';
 
             document.getElementById('prevBtn').removeEventListener('click', handlePrevClick);
             document.getElementById('nextBtn').removeEventListener('click', handleNextClick);
 
             document.getElementById('prevBtn').addEventListener('click', handlePrevClick);
             document.getElementById('nextBtn').addEventListener('click', handleNextClick);
-
-        } catch (error) {
-            console.error('Ошибка:', error);
+        } else {
+            console.error('Не удалось получить изображение из ответа.');
         }
-    });
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+});
+
+async function populateUpscaleSelect() {
+    try {
+        const response = await axios.get('http://localhost:7861/sdapi/v1/upscalers');
+        const upscalers = response.data;
+
+        upscalers.forEach(upscaler => {
+            const option = document.createElement('option');
+            option.value = upscaler.name;
+            option.textContent = upscaler.name;
+            upscaleSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Ошибка при получении списка апскейлеров:', error);
+    }
+}
 
 function displayImage(index) {
     const displayedImage = document.getElementById('displayedImage');
@@ -104,7 +98,7 @@ async function fetchProgressData() {
         const response = await axios.get('http://localhost:7861/sdapi/v1/progress?skip_current_image=false');
         updatePage(response.data);
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Ошибка при получении данных прогресса:', error);
     }
     setTimeout(fetchProgressData, 100);
 }
@@ -112,11 +106,11 @@ async function fetchProgressData() {
 function updatePage(data) {
     progressBar.value = data.progress * 100;
 
-    samplingStepElement.textContent = data.state.sampling_step;
-    samplingStepsElement.textContent = data.state.sampling_steps;
+    document.getElementById('sampling-step').textContent = data.state.sampling_step;
+    document.getElementById('sampling-steps').textContent = data.state.sampling_steps;
 
     const remainingTime = formatTime(data.eta_relative);
-    timeInfoElement.textContent = remainingTime;
+    document.getElementById('time-info').textContent = remainingTime;
 }
 
 function formatTime(timeInSeconds) {

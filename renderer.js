@@ -117,9 +117,14 @@ function formatTime(timeInSeconds) {
 	const seconds = Math.floor(timeInSeconds % 60);
 	return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
-document.getElementById('editImageBtn').addEventListener('click', function () {
+document.getElementById('editInpaint').addEventListener('click', function () {
     const displayedImageSrc = images[currentIndex];
     const encodedImage = encodeURIComponent(displayedImageSrc);
     window.location.href = `inpaint.html?image=${encodedImage}`;
+});
+document.getElementById('editImgtoimg').addEventListener('click', function () {
+    const displayedImageSrc = images[currentIndex];
+    const encodedImage = encodeURIComponent(displayedImageSrc);
+    window.location.href = `imgtoimg.html?image=${encodedImage}`;
 });
 
