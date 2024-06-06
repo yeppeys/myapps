@@ -14,6 +14,11 @@ const samplingStepsElement = document.getElementById('sampling-steps');
 const timeInfoElement = document.getElementById('time-info');
 const denoisingStrength = document.getElementById('denoising_strength');
 
+const dropArea = document.getElementById('drop-area');
+const canvas = document.getElementById('canvas');
+const placeholder = dropArea.querySelector('.placeholder');
+const droppedImage = document.getElementById('droppedImage');
+
 let width;
 let height;
 let originalImageDataURL;
@@ -137,14 +142,34 @@ function drop(event) {
         const image = new Image();
         image.src = e.target.result;
         image.onload = function () {
-            const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
             width = image.width;
             height = image.height;
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(image, 0, 0);
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const aspectRatio = image.width / image.height;
+            let drawWidth, drawHeight, offsetX, offsetY;
+
+            if (image.width > image.height) {
+                drawWidth = canvas.width;
+                drawHeight = canvas.width / aspectRatio;
+                offsetX = 0;
+                offsetY = (canvas.height - drawHeight) / 2;
+            } else {
+                drawHeight = canvas.height;
+                drawWidth = canvas.height * aspectRatio;
+                offsetX = (canvas.width - drawWidth) / 2;
+                offsetY = 0;
+            }
+
+            ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
             originalImageDataURL = canvas.toDataURL();
+            placeholder.style.display = 'none';
+            droppedImage.style.display = 'block';
+            droppedImage.src = originalImageDataURL;
+            canvas.style.display = 'none';
         }
     }
     reader.readAsDataURL(file);
@@ -157,14 +182,44 @@ function loadImageFromURL() {
         const image = new Image();
         image.src = `data:image/png;base64,${imageSrc}`;
         image.onload = function () {
-            const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             width = image.width;
             height = image.height;
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(image, 0, 0);
+            canvas.width = 512;
+            canvas.height = 512;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const aspectRatio = image.width / image.height;
+            let drawWidth, drawHeight, offsetX, offsetY;
+
+            if (image.width > image.height) {
+                drawWidth = canvas.width;
+                drawHeight = canvas.width / aspectRatio;
+                offsetX = 0;
+                offsetY = (canvas.height - drawHeight) / 2;
+            } else {
+                drawHeight = canvas.height;
+                drawWidth = canvas.height * aspectRatio;
+                offsetX = (canvas.width - drawWidth) / 2;
+                offsetY = 0;
+            }
+
+            ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
             originalImageDataURL = canvas.toDataURL();
+            placeholder.style.display = 'none';
+            droppedImage.style.display = 'block';
+            droppedImage.src = originalImageDataURL;
+            canvas.style.display = 'none';
         };
     }
 }
+document.getElementById('editInpaint').addEventListener('click', function () {
+    const displayedImageSrc = images[currentIndex];
+    const encodedImage = encodeURIComponent(displayedImageSrc);
+    window.location.href = `inpaint.html?image=${encodedImage}`;
+});
+document.getElementById('editUpscale').addEventListener('click', function () {
+    const displayedImageSrc = images[currentIndex];
+    const encodedImage = encodeURIComponent(displayedImageSrc);
+    window.location.href = `upscale.html?image=${encodedImage}`;
+});

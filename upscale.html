@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,15 +18,33 @@
     }
 
     #drop-area {
-        width: 100%;
+        width: 512px;
+        height: 512px;
         border: 2px dashed #ccc;
         margin-bottom: 20px;
         position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    #drop-area img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: none;
+    }
+
+    #drop-area .placeholder {
+        position: absolute;
+        text-align: center;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 18px;
     }
 
     #canvas {
-        display: block;
-        margin: 0 auto;
+        display: none;
     }
 
     #right-section {
@@ -97,32 +114,33 @@
         opacity: 0.75;
         display: none;
     }
+    .notification {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+}
 </style>
-
 <body onload="loadImageFromURL()">
-
     <div id="container">
         <div id="left-section">
             <div id="drop-area" ondrop="drop(event)" ondragover="allowDrop(event)">
-                Перетащите сюда изображение
-                <canvas id="canvas"></canvas>
+                <div class="placeholder">Переместите изображение в эту область</div>
+                <img id="droppedImage" alt="Dropped Image">
+                <canvas id="canvas" style="display: none;"></canvas>
             </div>
         </div>
-
         <div id="right-section">
             <form id="imageForm">
-                <select id="upscaleSelect"></select>
-                <label for="resize">Изменить размер:</label><br>
+                <select id="upscaleSelect"></select><br>
+                <label for="resize">Изменить размер:</label>
                 <input type="number" id="resize" name="resize" min="1" max="8" value="2" step="0.05"><br>
                 <button type="submit">Апскейл изображения</button>
             </form>
-
-            <div class="progress-bar">
-                <progress id="progress" max="100" value="0"></progress>
-                <span id="sampling-step"> </span>/<span id="sampling-steps"> </span>
-                <span id="time-info">00:00</span>
-            </div>
-
             <div id="imageGallery">
                 <div id="imageContainer">
                     <button id="prevBtn">&#10094;</button>
@@ -133,8 +151,12 @@
             </div>
         </div>
     </div>
-
+    <button id="editInpaint">Редактировать в Inpaint</button>
+    <button id="editImgtoimg">Редактировать в img to img</button>
+    <br>
+    <a href="index.html">
+        <button>Назад</button><br><br>
+    </a>
     <script src="upscale.js"></script>
 </body>
-
 </html>

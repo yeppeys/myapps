@@ -16,9 +16,13 @@ const denoisingStrength = document.getElementById('denoising_strength')
 
 const dropArea = document.getElementById('drop-area');
 const canvas = document.getElementById('canvas');
+const placeholder = dropArea.querySelector('.placeholder');
+const droppedImage = document.getElementById('droppedImage');
 const ctx = canvas.getContext('2d');
 const maskCanvas = document.createElement('canvas');
 const maskCtx = maskCanvas.getContext('2d');
+
+
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
@@ -147,30 +151,50 @@ function formatTime(timeInSeconds) {
 	return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 function allowDrop(event) {
-	event.preventDefault();
+    event.preventDefault();
 }
 
 function drop(event) {
-	event.preventDefault();
-	const file = event.dataTransfer.files[0];
-	const reader = new FileReader();
-	reader.onload = function (e) {
-		const image = new Image();
-		image.src = e.target.result;
-		image.onload = function () {
-			const width = image.width;
-			const height = image.height;
-			canvas.width = width;
-			canvas.height = height;
-			maskCanvas.width = width;
-			maskCanvas.height = height;
-			ctx.drawImage(image, 0, 0);
-			originalImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
-			originalImageDataURL = canvas.toDataURL();
-		}
-	}
-	reader.readAsDataURL(file);
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const image = new Image();
+        image.src = e.target.result;
+        image.onload = function () {
+            width = image.width;
+            height = image.height;
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const aspectRatio = image.width / image.height;
+            let drawWidth, drawHeight, offsetX, offsetY;
+
+            if (image.width > image.height) {
+                drawWidth = canvas.width;
+                drawHeight = canvas.width / aspectRatio;
+                offsetX = 0;
+                offsetY = (canvas.height - drawHeight) / 2;
+            } else {
+                drawHeight = canvas.height;
+                drawWidth = canvas.height * aspectRatio;
+                offsetX = (canvas.width - drawWidth) / 2;
+                offsetY = 0;
+            }
+
+            ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+            originalImageDataURL = canvas.toDataURL();
+            placeholder.style.display = 'none';
+            droppedImage.style.display = 'none';
+            droppedImage.src = originalImageDataURL;
+            canvas.style.display = 'block';
+        }
+    }
+    reader.readAsDataURL(file);
 }
+
 canvas.addEventListener('mousedown', (e) => {
 	isDrawing = true;
 	[lastX, lastY] = [e.offsetX, e.offsetY];
@@ -257,6 +281,7 @@ function showMask() {
 	maskCtx.putImageData(imageData, 0, 0);
 	document.body.appendChild(maskCanvas);
 }
+
 function loadImageFromURL() {
     const params = new URLSearchParams(window.location.search);
     const imageSrc = params.get('image');
@@ -264,11 +289,44 @@ function loadImageFromURL() {
         const image = new Image();
         image.src = `data:image/png;base64,${imageSrc}`;
         image.onload = function () {
-            canvas.width = image.width;
-            canvas.height = image.height;
-            ctx.drawImage(image, 0, 0);
-            originalImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const ctx = canvas.getContext('2d');
+            width = image.width;
+            height = image.height;
+            canvas.width = 512;
+            canvas.height = 512;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const aspectRatio = image.width / image.height;
+            let drawWidth, drawHeight, offsetX, offsetY;
+
+            if (image.width > image.height) {
+                drawWidth = canvas.width;
+                drawHeight = canvas.width / aspectRatio;
+                offsetX = 0;
+                offsetY = (canvas.height - drawHeight) / 2;
+            } else {
+                drawHeight = canvas.height;
+                drawWidth = canvas.height * aspectRatio;
+                offsetX = (canvas.width - drawWidth) / 2;
+                offsetY = 0;
+            }
+
+            ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
             originalImageDataURL = canvas.toDataURL();
+            placeholder.style.display = 'none';
+            droppedImage.style.display = 'none';
+            droppedImage.src = originalImageDataURL;
+            canvas.style.display = 'block';
         };
     }
+	document.getElementById('editImgtoimg').addEventListener('click', function () {
+		const displayedImageSrc = images[currentIndex];
+		const encodedImage = encodeURIComponent(displayedImageSrc);
+		window.location.href = `imgtoimg.html?image=${encodedImage}`;
+	});
+	document.getElementById('editUpscale').addEventListener('click', function () {
+		const displayedImageSrc = images[currentIndex];
+		const encodedImage = encodeURIComponent(displayedImageSrc);
+		window.location.href = `upscale.html?image=${encodedImage}`;
+	});
 }

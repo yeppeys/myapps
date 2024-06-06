@@ -79,6 +79,15 @@
             opacity: 0.75;
             display: none;
 }
+.resolution-input {
+            display: flex;
+            align-items: center;
+        }
+        .resolution-input input {
+            width: 60px;
+            margin: 0 5px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -87,10 +96,20 @@
         <input type="text" id="prompt" name="prompt"><br>
         <label for="negative_prompt">Негативный запрос:</label><br>
         <input type="text" id="negative_prompt" name="negative_prompt"><br>
+        <label for="samplerSelect">Метод сэмплирования:</label>
+        <select id="samplerSelect"></select><br>
         <label for="steps">Количество шагов:</label><br>
-        <input type="number" id="steps" name="steps" min="1" max="100"><br>
+        <input type="number" id="steps" name="steps" min="1" max="100" value="20"><br>
         <label for="batch_size">Количество генерируемых картинок:</label><br>
-        <input type="number" id="batch_size" name="batch_size" min="1" max="8"><br>
+        <input type="number" id="batch_size" name="batch_size" min="1" max="8" value="1"><br>
+        <label for="cfg_scale">Креативность:</label><br>
+        <input type="number" id="cfg_scale" name="cfg_scale" min="1" max="30" value="7" step="0.5"><br>
+        <div class="resolution-input">
+            <label for="width">Разрешение</label>
+            <input type="number" id="width" name="width" value="512" min="1">
+            <span>x</span>
+            <input type="number" id="height" name="height" value="512" min="1">
+        </div>
         <input type="checkbox" id="restore_faces" name="restore_faces">
         <label for="restore_faces">Восстановить лица</label><br>
         <button type="submit">Сгенерировать изображение</button>
@@ -113,8 +132,12 @@
 
     <button id="editInpaint">Редактировать в Inpaint</button>
     <button id="editImgtoimg">Редактировать в img to img</button>
-
-
+    <button id="editUpscale">Апскейл изображения</button>
+    <br>
+    <a href="index.html">
+        <button>Назад</button><br><br>
+    </a>
     <script src="renderer.js"></script>
 </body>
 </html>
+
