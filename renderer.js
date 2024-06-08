@@ -39,9 +39,7 @@ async function fetchSamplers() {
 // Call fetchSamplers on page load
 fetchSamplers();
 
-form.addEventListener('submit', async function (event) {
-    event.preventDefault();
-
+document.getElementById('submit').addEventListener('click', async function () {
     const prompt = promptInput.value;
     const negativePrompt = negativePromptInput.value;
     const steps = stepsInput.value;
@@ -51,6 +49,7 @@ form.addEventListener('submit', async function (event) {
     const width = widthInput.value;
     const height = heightInput.value;
     const samplerName = samplerSelect.value;
+
 
     try {
         const [translatedPrompt, translatedNegativePrompt] = await Promise.all([
@@ -127,7 +126,7 @@ async function fetchProgressData() {
     } catch (error) {
         console.error('Error fetching data:', error);
     }
-    setTimeout(fetchProgressData, 100);
+    setTimeout(fetchProgressData, 1000);
 }
 
 function updatePage(data) {

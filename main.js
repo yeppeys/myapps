@@ -60,7 +60,7 @@ app.on('window-all-closed', function () {
 });
 
 function startServer() {
-	const command = 'powershell -NoLogo -WindowStyle Hidden -ExecutionPolicy Unrestricted -Command "cd C://stable-diffusion-webui; ./webui.bat --nowebui"';
+	const command = 'powershell -NoLogo -WindowStyle Hidden -ExecutionPolicy Unrestricted -Command "cd C://stable-diffusion-webui; ./webui.bat --nowebui --no-half-vae"';
 	const maxBuffer = 100 * 1024 * 1024;
 
 	serverProcess = exec(command, { detached: true, shell: true, maxBuffer: maxBuffer });
