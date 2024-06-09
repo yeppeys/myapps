@@ -108,6 +108,9 @@ document.getElementById('submit').addEventListener('click', async function () {
 		if (images.length > 0) {
 			displayImage(currentIndex);
 
+			document.getElementById('editImgtoimg').classList.remove('hidden');
+			document.getElementById('editUpscale').classList.remove('hidden');
+
 			if (images.length === 1) {
 				document.getElementById('prevBtn').style.display = 'none';
 				document.getElementById('nextBtn').style.display = 'none';

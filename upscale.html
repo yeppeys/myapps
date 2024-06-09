@@ -8,6 +8,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300&display=swap" rel="stylesheet">
     <style>
+         .notification {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+}
         body {
             font-family: 'Inter', sans-serif;
             font-weight: 300;
@@ -214,7 +224,7 @@
             <form id="imageForm">
                 <select id="upscaleSelect"></select>
                 <label for="resize">изменить размер:</label>
-                <input type="range" id="resize" name="resize" min="1" max="8" value="2" step="0.1" oninput="updateRangeValue(this.value)">
+                <input type="range" id="resize" name="resize" min="1" max="8" value="2" step="0.2" oninput="updateRangeValue(this.value)">
                 <span class="range-value" id="rangeValue">2</span>
                 <button type="submit"style="margin-left: 368px;">АПСКЕЙЛ ИЗОБРАЖЕНИЯ</button>
             </form>
