@@ -34,7 +34,9 @@
     color: rgba(0, 0, 0, 0.5);
     font-size: 18px;
 }
-
+#droppedImage {
+        display: none;
+    }
     #canvas {
         display: block;
         margin: 0 auto;
@@ -316,7 +318,7 @@
 
     </style>
 </head>
-<body>
+<body onload="loadImageFromURL()">
     <div>
         <a href="index.html" class="back-button">назад</a>
     </div>
@@ -325,7 +327,7 @@
             <div class="container-drop" style="margin-right: 65px;">
                 <div id="drop-area" ondrop="drop(event)" ondragover="allowDrop(event)">
                     <div class="placeholder">Переместите изображение в эту область</div>
-                    <img id="droppedImage">
+                    <img id="droppedImage" alt="Dropped Image">
                     <canvas id="canvas" style="display: none;"></canvas>
                 </div>
             </div>
@@ -460,6 +462,6 @@
                     </style>
             
 
-    <script src="renderer.js"></script>
+    <script src="imgtoimg.js"></script>
 </body>
 </html>
