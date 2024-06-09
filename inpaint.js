@@ -13,6 +13,8 @@ const samplingStepElement = document.getElementById('sampling-step');
 const samplingStepsElement = document.getElementById('sampling-steps');
 const timeInfoElement = document.getElementById('time-info');
 const denoisingStrength = document.getElementById('denoising_strength')
+const cfg_scaleInput = document.getElementById('cfg_scale');
+const samplerSelect = document.getElementById('samplerSelect');
 
 const dropArea = document.getElementById('drop-area');
 const canvas = document.getElementById('canvas');
@@ -36,8 +38,24 @@ let maskDataURL;
 let currentIndex = 0;
 let images = [];
 
-form.addEventListener('submit', async function (event) {
-	event.preventDefault();
+async function fetchSamplers() {
+    try {
+        const response = await axios.get('http://localhost:7861/sdapi/v1/samplers');
+        const samplers = response.data;
+        samplers.forEach(sampler => {
+            const option = document.createElement('option');
+            option.value = sampler.name;
+            option.textContent = sampler.name;
+            samplerSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching samplers:', error);
+    }
+}
+
+fetchSamplers();
+
+document.getElementById('submit').addEventListener('click', async function () {
 
 	const prompt = promptInput.value;
 	const negativePrompt = negativePromptInput.value;
@@ -46,6 +64,8 @@ form.addEventListener('submit', async function (event) {
 	const restoreFaces = restoreFacesInput.checked;
 	const init_images = [originalImageDataURL]
 	const denoising_strength = denoisingStrength.value;
+	const cfg_scale = cfg_scaleInput.value;
+    const samplerName = samplerSelect.value;
 
 	try {
 		const [translatedPrompt, translatedNegativePrompt] = await Promise.all([
@@ -69,6 +89,8 @@ form.addEventListener('submit', async function (event) {
 			width,
 			height,
 			init_images,
+			sampler_name: samplerName,
+            cfg_scale,
 			mask: maskDataURL,
 			inpainting_fill: 32,
 			inpaint_full_res: false,
@@ -263,24 +285,6 @@ function saveMask() {
 	console.log(maskDataURL);
 }
 
-function showMask() {
-	maskCtx.drawImage(canvas, 0, 0);
-	const imageData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
-	for (let i = 0; i < imageData.data.length; i += 4) {
-		const r = imageData.data[i];
-		const g = imageData.data[i + 1];
-		const b = imageData.data[i + 2];
-		const a = imageData.data[i + 3];
-		if (r !== 255 || g !== 255 || b !== 255 || a === 0) {
-			imageData.data[i] = 0;
-			imageData.data[i + 1] = 0;
-			imageData.data[i + 2] = 0;
-			imageData.data[i + 3] = 255;
-		}
-	}
-	maskCtx.putImageData(imageData, 0, 0);
-	document.body.appendChild(maskCanvas);
-}
 
 function loadImageFromURL() {
     const params = new URLSearchParams(window.location.search);

@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadImageFromURL();
 });
 
-form.addEventListener('submit', async function (event) {
+document.getElementById('submit').addEventListener('click', async function ()  {
     event.preventDefault();
 
     const selectedUpscaler = upscaleSelect.value;

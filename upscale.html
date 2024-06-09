@@ -4,143 +4,202 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upscale</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .drop-and-gallery-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 70px;
+        }
+
+        #drop-area {
+            width: 512px;
+            height: 512px;
+            border: 2px dashed #ccc;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        #drop-area img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        #drop-area .placeholder {
+            position: absolute;
+            text-align: center;
+            color: rgba(0, 0, 0, 0.5);
+            font-size: 18px;
+        }
+
+        #droppedImage {
+            display: none;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        #imageGallery {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #imageContainer {
+            width: 512px;
+            height: 512px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            background: #D9D9D9;
+            border-radius: 10px;
+        }
+
+        #imageContainer img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        #prevBtn, #nextBtn {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 16px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            z-index: 1;
+            opacity: 0.5;
+            display: none;
+        }
+
+        #prevBtn {
+            left: 10px;
+        }
+
+        #nextBtn {
+            right: 10px;
+        }
+
+        #imageNumber {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            opacity: 0.75;
+            display: none;
+        }
+
+        .form-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .form-container form {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-container select {
+            margin-right: 10px;
+        }
+
+        .form-container label {
+            margin-right: 10px;
+        }
+
+        .form-container input[type="range"] {
+            vertical-align: middle;
+        }
+
+        .form-container .range-value {
+            display: inline-block;
+            width: 30px;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: black;
+            cursor: pointer;
+            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        button:hover {
+            background-color: #d5d5d5;
+        }
+
+        .back-button-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+
+        .back-button {
+            font-size: 30px;
+            text-decoration: none;
+            color: black;
+        }
+    </style>
 </head>
-<style>
-    #container {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-    }
-
-    #left-section {
-        flex: 1;
-        margin-right: 20px;
-    }
-
-    #drop-area {
-        width: 512px;
-        height: 512px;
-        border: 2px dashed #ccc;
-        margin-bottom: 20px;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-
-    #drop-area img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        display: none;
-    }
-
-    #drop-area .placeholder {
-        position: absolute;
-        text-align: center;
-        color: rgba(0, 0, 0, 0.5);
-        font-size: 18px;
-    }
-
-    #canvas {
-        display: none;
-    }
-
-    #right-section {
-        flex: 1;
-    }
-
-    #imageGallery {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        margin-bottom: 20px;
-    }
-
-    #imageContainer {
-        width: 512px;
-        height: 512px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        overflow: hidden;
-    }
-
-    #imageContainer img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-
-    #prevBtn,
-    #nextBtn {
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        border: none;
-        cursor: pointer;
-        padding: 16px;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 18px;
-        z-index: 1;
-        opacity: 0.5;
-        display: none;
-    }
-
-    #prevBtn {
-        left: 10px;
-    }
-
-    #nextBtn {
-        right: 10px;
-    }
-
-    #imageNumber {
-        position: absolute;
-        bottom: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 14px;
-        opacity: 0.75;
-        display: none;
-    }
-    .notification {
-    position: fixed;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-}
-</style>
 <body onload="loadImageFromURL()">
-    <div id="container">
-        <div id="left-section">
+    <div class="back-button-container">
+        <a href="index.html" class="back-button">назад</a>
+    </div>
+    <div class="main-container">
+        <div class="drop-and-gallery-container">
             <div id="drop-area" ondrop="drop(event)" ondragover="allowDrop(event)">
                 <div class="placeholder">Переместите изображение в эту область</div>
                 <img id="droppedImage" alt="Dropped Image">
-                <canvas id="canvas" style="display: none;"></canvas>
+                <canvas id="canvas"></canvas>
             </div>
-        </div>
-        <div id="right-section">
-            <form id="imageForm">
-                <select id="upscaleSelect"></select><br>
-                <label for="resize">Изменить размер:</label>
-                <input type="number" id="resize" name="resize" min="1" max="8" value="2" step="0.05"><br>
-                <button type="submit">Апскейл изображения</button>
-            </form>
+
             <div id="imageGallery">
                 <div id="imageContainer">
                     <button id="prevBtn">&#10094;</button>
@@ -150,13 +209,27 @@
                 </div>
             </div>
         </div>
+
+        <div class="form-container">
+            <form id="imageForm">
+                <select id="upscaleSelect"></select>
+                <label for="resize">изменить размер:</label>
+                <input type="range" id="resize" name="resize" min="1" max="8" value="2" step="0.1" oninput="updateRangeValue(this.value)">
+                <span class="range-value" id="rangeValue">2</span>
+                <button type="submit"style="margin-left: 368px;">АПСКЕЙЛ ИЗОБРАЖЕНИЯ</button>
+            </form>
+        </div>
     </div>
-    <button id="editInpaint">Редактировать в Inpaint</button>
-    <button id="editImgtoimg">Редактировать в img to img</button>
-    <br>
-    <a href="index.html">
-        <button>Назад</button><br><br>
-    </a>
+
+    <script>
+        function updateRangeValue(value) {
+            document.getElementById('rangeValue').textContent = value;
+        }
+    </script>
+
     <script src="upscale.js"></script>
 </body>
 </html>
+
+
+
