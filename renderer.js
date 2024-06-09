@@ -20,14 +20,13 @@ const samplerSelect = document.getElementById('samplerSelect');
 let currentIndex = 0;
 let images = [];
 
-// Function to fetch and populate samplers
 async function fetchSamplers() {
     try {
         const response = await axios.get('http://localhost:7861/sdapi/v1/samplers');
         const samplers = response.data;
         samplers.forEach(sampler => {
             const option = document.createElement('option');
-            option.value = sampler.name; // Assuming each sampler has a 'name' property
+            option.value = sampler.name;
             option.textContent = sampler.name;
             samplerSelect.appendChild(option);
         });
@@ -36,7 +35,6 @@ async function fetchSamplers() {
     }
 }
 
-// Call fetchSamplers on page load
 fetchSamplers();
 
 document.getElementById('submit').addEventListener('click', async function () {

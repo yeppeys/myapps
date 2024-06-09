@@ -13,6 +13,9 @@ const samplingStepElement = document.getElementById('sampling-step');
 const samplingStepsElement = document.getElementById('sampling-steps');
 const timeInfoElement = document.getElementById('time-info');
 const denoisingStrength = document.getElementById('denoising_strength');
+const cfg_scaleInput = document.getElementById('cfg_scale');
+const samplerSelect = document.getElementById('samplerSelect');
+
 
 const dropArea = document.getElementById('drop-area');
 const canvas = document.getElementById('canvas');
@@ -23,8 +26,24 @@ let width;
 let height;
 let originalImageDataURL;
 
-form.addEventListener('submit', async function (event) {
-    event.preventDefault();
+async function fetchSamplers() {
+    try {
+        const response = await axios.get('http://localhost:7861/sdapi/v1/samplers');
+        const samplers = response.data;
+        samplers.forEach(sampler => {
+            const option = document.createElement('option');
+            option.value = sampler.name;
+            option.textContent = sampler.name;
+            samplerSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching samplers:', error);
+    }
+}
+
+fetchSamplers();
+
+document.getElementById('submit').addEventListener('click', async function () {
 
     const prompt = promptInput.value;
     const negativePrompt = negativePromptInput.value;
@@ -33,6 +52,8 @@ form.addEventListener('submit', async function (event) {
     const restoreFaces = restoreFacesInput.checked;
     const init_images = [originalImageDataURL];
     const denoising_strength = denoisingStrength.value;
+    const cfg_scale = cfg_scaleInput.value;
+    const samplerName = samplerSelect.value;
 
     try {
         const [translatedPrompt, translatedNegativePrompt] = await Promise.all([
@@ -54,7 +75,9 @@ form.addEventListener('submit', async function (event) {
             denoising_strength,
             width,
             height,
-            init_images
+            init_images,
+            sampler_name: samplerName,
+            cfg_scale
         });
 
             currentIndex = 0;
