@@ -22,8 +22,10 @@ function createLoadingWindow() {
 
 function createMainWindow() {
 	const mainWindow = new BrowserWindow({
-		width: 1920,
-		height: 1080,
+		width: 1780,
+		height: 800,
+		resizable: false,   
+		maximizable: false,
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false
